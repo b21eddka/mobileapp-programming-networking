@@ -2,6 +2,7 @@ package com.example.networking;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +15,9 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
     private final String JSON_FILE = "mountains.json";
 
     private ArrayList<Mountain> mountainList = new ArrayList<>();
+
+    private TextView textView = findViewById(R.id.textView);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
