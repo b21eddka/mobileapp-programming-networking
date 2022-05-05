@@ -39,4 +39,15 @@ public class Mountain {
     public int getHeight() {
         return height;
     }
+
+    @Override
+    public String toString() {
+        return "Mountain{" +
+                "ID='" + ID + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", location='" + location + '\'' +
+                ", height=" + height +
+                '}';
+    }
 }
