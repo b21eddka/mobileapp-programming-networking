@@ -1,42 +1,92 @@
 
-# Rapport
+Målet med uppgiften var att utifrån den information som togs från webplatsen kunna visa i aktiviteten genom en recyclerView.
+RecyclerView är användbart då, till skillnad från ListView där alla element laddas ned, så gäller det bara de element som är på skärmen samt några fler både över och under.
+En Mountain java fil gjordes med variabler, constructor och getter som en mall för objekten som kommer att parse från Json.
+Ännu en xml fil skapades då det är i denna TextView objekten kommer att visas i.
+En RecyclerViewAdapter behövdes för datahantering och i denna fil skapades ännu en klass "ViewHolder".
+För att denna RecyclerViewAdapter skulle kunna ärva metoder från RecyclerView.Adapter behövdes tre metoder overide (onCreateViewHolder, onBindViewHolder och getItemCount).
+Till sist behövdes allt kopplas ihop till Json URL där datan skulle importeras ifrån vilket gjordes inom MainActicity.
 
-**Skriv din rapport här!**
-
-_Du kan ta bort all text som finns sedan tidigare_.
-
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
 
 ```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+
+    private ArrayList<Mountain> mountainList;
+
+    public RecyclerViewAdapter(MainActivity mainActivity, ArrayList<Mountain> mountainList){
+        this.mountainList = mountainList;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private TextView mountainText;
+
+        ViewHolder(View view) {
+            super(view);
+            mountainText = view.findViewById(R.id.textView);
+        }
+    }
+
+    @NonNull
+    @Override
+    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_mountains, parent, false);
+        return new ViewHolder(itemView);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerViewAdapter.ViewHolder holder, int position) {
+
+        String ID = mountainList.get(position).getID();
+        String name = mountainList.get(position).getName();
+        String type = mountainList.get(position).getType();
+        String location = mountainList.get(position).getLocation();
+        int height = mountainList.get(position).getHeight();
+
+        holder.mountainText.setText("ID: " + ID + "\nName: " + name + "\nType: " + type + "\nLocation: " + location + "\nHeight: " + height + "m above sea level");
+    }
+
+    @Override
+    public int getItemCount() {
+        return mountainList.size();
     }
 }
 ```
+```
+public class MainActivity extends AppCompatActivity implements JsonTask.JsonTaskListener {
 
-Bilder läggs i samma mapp som markdown-filen.
+    private final String JSON_URL = "https://mobprog.webug.se/json-api?login=brom";
 
-![](android.png)
+    private ArrayList<Mountain> mountainList;
+    private RecyclerView recyclerView;
+    RecyclerViewAdapter recyclerViewAdapter;
 
-Läs gärna:
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+        new JsonTask(this).execute(JSON_URL);
+        recyclerView = findViewById(R.id.recyclerView);
+        mountainList = new ArrayList<>();
+        recyclerViewAdapter = new RecyclerViewAdapter(this, mountainList);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(recyclerViewAdapter);
+    }
+
+    @Override
+    public void onPostExecute(String json) {
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Mountain>>() {}.getType();
+        ArrayList<Mountain> mountainListArray = gson.fromJson(json, type);
+        mountainList.addAll(mountainListArray);
+        recyclerViewAdapter.notifyDataSetChanged();
+        Log.d("MainActivity", json);
+    }
+
+}
+´´´
+
+![](Skärmdump.png)
