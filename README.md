@@ -52,6 +52,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 }
 ```
+
 ```
 public class MainActivity extends AppCompatActivity implements JsonTask.JsonTaskListener {
 
@@ -87,6 +88,6 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
     }
 
 }
-´´´
+```
 
 ![](Skärmdump.png)
